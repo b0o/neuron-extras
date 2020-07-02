@@ -95,7 +95,7 @@ def merge_recursive:
               | . as $acc
               | $e.value
               | {
-                  zettels: ($acc.zettels + .zettels),
+                  zettels: ($acc.zettels + .zettels | sort_by(.zettelDay | strptime("%Y-%m-%d") | mktime * -1)),
                   children: ($acc.children + .children)
                 }
             )
