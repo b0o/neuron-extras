@@ -1,0 +1,17 @@
+#!/bin/bash
+set -Eeuo pipefail
+shopt -s inherit_errexit
+
+declare -g basedir
+basedir="$(realpath -e "$(dirname "${BASH_SOURCE[0]}")")"
+
+# shellcheck source=/home/maddy/.env
+source "$HOME/.env"
+cd "$HOME/zettelkasten"
+
+if [[ ${1:-} =~ ^(-w|--watch)$ ]]; then
+  reflex -d none -sg '*.md' -G 'index*' -- \
+    bash -c "neuron query --graph | jq -r -L '$basedir' 'import \"neuron-autoindex\" as n; n::main' | bash"
+else
+  neuron query --graph | jq -r -L "$basedir" 'import "neuron-autoindex" as n; n::main' | bash
+fi
